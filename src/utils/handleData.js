@@ -14,12 +14,16 @@ const convertUnixToMoment = arr => _.map(arr, item => ({
   date: moment(item.date),
   device: item.device,
 }));
+const dropWhileDate = arr => _.dropWhile(
+  arr,
+  item => item.date.format('YYYY-MM-DDTHH:00:00+09:00')
+      !== '2017-09-20T13:00:00+09:00',
+);
 const groupUsersPerHours = arr => _.groupBy(arr, item => item.date.format('YYYY-MM-DDTHH'));
 const calcUsersNum = obj => _.map(obj, item => ({
   users: item.length,
   date: item[0].date.format('YYYY-MM-DDTHH:00:00+09:00'),
 }));
-const dropWhileDate = obj => _.dropWhile(obj, item => item.date !== '2017-09-20T12:00:00+09:00');
 
 const iOSFiltered = filterByDevice(rawData, deviceTypes.iOS);
 const androidFiltered = filterByDevice(rawData, deviceTypes.android);
@@ -30,19 +34,19 @@ const androidUsersConvertedDate = convertUnixToMoment(
   sortByDate(androidFiltered),
 );
 
-const allUsersPerHours = calcUsersNum(
-  groupUsersPerHours(allUsersConvertedDate),
+const allUsersPerHours = groupUsersPerHours(
+  dropWhileDate(allUsersConvertedDate),
 );
-const iOSUsersPerHours = calcUsersNum(
-  groupUsersPerHours(iOSUsersConvertedDate),
+const iOSUsersPerHours = groupUsersPerHours(
+  dropWhileDate(iOSUsersConvertedDate),
 );
-const androidUsersPerHours = calcUsersNum(
-  groupUsersPerHours(androidUsersConvertedDate),
+const androidUsersPerHours = groupUsersPerHours(
+  dropWhileDate(androidUsersConvertedDate),
 );
 
-const allUsers = dropWhileDate(allUsersPerHours);
-const iOSUsers = dropWhileDate(iOSUsersPerHours);
-const androidUsers = dropWhileDate(androidUsersPerHours);
+const allUsers = calcUsersNum(allUsersPerHours);
+const iOSUsers = calcUsersNum(iOSUsersPerHours);
+const androidUsers = calcUsersNum(androidUsersPerHours);
 
 export default {
   rawData,
@@ -52,6 +56,7 @@ export default {
   convertUnixToMoment,
   groupUsersPerHours,
   calcUsersNum,
+  allUsersPerHours,
   allUsers,
   iOSUsers,
   androidUsers,
