@@ -14,39 +14,25 @@ const convertUnixToMoment = arr => _.map(arr, item => ({
   date: moment(item.date),
   device: item.device,
 }));
-const dropWhileDate = arr => _.dropWhile(
-  arr,
-  item => item.date.format('YYYY-MM-DDTHH:00:00+09:00')
-      !== '2017-09-20T13:00:00+09:00',
-);
 const groupUsersPerHours = arr => _.groupBy(arr, item => item.date.format('YYYY-MM-DDTHH'));
-const calcUsersNum = obj => _.map(obj, item => ({
+const sumUsersNum = obj => _.map(obj, item => ({
   users: item.length,
   date: item[0].date.format('YYYY-MM-DDTHH:00:00+09:00'),
 }));
+const makeGroupedUsers = (data) => {
+  const sortedByDate = sortByDate(data);
+  const convertedDate = convertUnixToMoment(sortedByDate);
+  return groupUsersPerHours(convertedDate);
+};
 
 const iOSFiltered = filterByDevice(rawData, deviceTypes.iOS);
 const androidFiltered = filterByDevice(rawData, deviceTypes.android);
 
-const allUsersConvertedDate = convertUnixToMoment(sortByDate(rawData));
-const iOSUsersConvertedDate = convertUnixToMoment(sortByDate(iOSFiltered));
-const androidUsersConvertedDate = convertUnixToMoment(
-  sortByDate(androidFiltered),
-);
+const groupedAllUsers = makeGroupedUsers(rawData);
 
-const allUsersPerHours = groupUsersPerHours(
-  dropWhileDate(allUsersConvertedDate),
-);
-const iOSUsersPerHours = groupUsersPerHours(
-  dropWhileDate(iOSUsersConvertedDate),
-);
-const androidUsersPerHours = groupUsersPerHours(
-  dropWhileDate(androidUsersConvertedDate),
-);
-
-const allUsers = calcUsersNum(allUsersPerHours);
-const iOSUsers = calcUsersNum(iOSUsersPerHours);
-const androidUsers = calcUsersNum(androidUsersPerHours);
+const allUsers = sumUsersNum(groupedAllUsers);
+const iOSUsers = sumUsersNum(makeGroupedUsers(iOSFiltered));
+const androidUsers = sumUsersNum(makeGroupedUsers(androidFiltered));
 
 export default {
   rawData,
@@ -55,8 +41,8 @@ export default {
   sortByDate,
   convertUnixToMoment,
   groupUsersPerHours,
-  calcUsersNum,
-  allUsersPerHours,
+  sumUsersNum,
+  groupedAllUsers,
   allUsers,
   iOSUsers,
   androidUsers,
