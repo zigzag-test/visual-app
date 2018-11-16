@@ -50,7 +50,7 @@ describe('handleData', () => {
   test('groupUsersPerHours', () => {
     const convertedData = data.convertUnixToMoment(mockData);
     const result = data.groupUsersPerHours(convertedData);
-    expect(Object.keys(result)[0]).toEqual('2017-09-20T04');
+    expect(Object.keys(result)[0]).toEqual('2017-09-20T04:00:00+09:00');
   });
 
   test('sumUsersNum', () => {
