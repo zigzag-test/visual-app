@@ -2,7 +2,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import data from '../../utils/handleData';
 
-const allInfo = _.map(data.allUsersPerHours, item => ({
+const allInfo = _.map(data.groupedAllUsers, item => ({
   date: item[0].date,
   all: item.length,
   ios: _.filter(item, atomic => _.startsWith(atomic.device, 'iOS')).length,

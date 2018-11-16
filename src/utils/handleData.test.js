@@ -50,13 +50,13 @@ describe('handleData', () => {
   test('groupUsersPerHours', () => {
     const convertedData = data.convertUnixToMoment(mockData);
     const result = data.groupUsersPerHours(convertedData);
-    expect(Object.keys(result)[0]).toEqual('2017-09-20T04');
+    expect(Object.keys(result)[0]).toEqual('2017-09-20T04:00:00+09:00');
   });
 
-  test('calcUsersNum', () => {
+  test('sumUsersNum', () => {
     const convertedData = data.convertUnixToMoment(mockData);
     const groupedData = data.groupUsersPerHours(convertedData);
-    const result = data.calcUsersNum(groupedData);
+    const result = data.sumUsersNum(groupedData);
     expect(result[0].date).toEqual('2017-09-20T04:00:00+09:00');
   });
 });
